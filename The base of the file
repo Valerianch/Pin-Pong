@@ -1,0 +1,24 @@
+from pygame import *
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, playre_image, x, y, speed):
+        super().__init__()
+        self.image = transform.scale(image.load(print_image))
+        self.speed = speed
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        
+class Playre(GameSprite):
+    def letter(self):
+        if keys_pressed[K_w] and self.rect.y > 5:
+            self.rect.y -= 10
+        if keys_pressed[K_s] and self.rect.y < 5:
+            self.rect.y += 10
+
+windw = display.set_mode((700,600))
+display.set_caption('Пин-Понг')
+screen =transform.scale(image.load('paint_grunge_green_124502_2560x1080.jpg'), (700,600))
+
+
+windw.blit(screen,(0,0))
