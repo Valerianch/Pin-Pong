@@ -1,24 +1,79 @@
 from pygame import *
 
 class GameSprite(sprite.Sprite):
-    def __init__(self, playre_image, x, y, speed):
+    def __init__(self, playre_image, x, y, w, h, speed):
         super().__init__()
-        self.image = transform.scale(image.load(print_image))
+        self.image = transform.scale(image.load(playre_image), (w,h))
         self.speed = speed
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    def reset(self):
+        windw.blit(self.image, (self.rect.x, self.rect.y))
         
 class Playre(GameSprite):
     def letter(self):
+        keys_pressed = key.get_pressed()
         if keys_pressed[K_w] and self.rect.y > 5:
-            self.rect.y -= 10
-        if keys_pressed[K_s] and self.rect.y < 5:
-            self.rect.y += 10
+            self.rect.y -= self.speed
+        if keys_pressed[K_s] and self.rect.y < 340:
+            self.rect.y += self.speed
+    
+    def movement(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_UP] and self.rect.y > 5:
+            self.rect.y -= self.speed
+        if keys_pressed[K_DOWN] and self.rect.y < 340:
+            self.rect.y += self.speed
+            
+class Ball(GameSprite):
+    def __init__(self, playre_image, x, y, w, h, speed, speed_x, speed_y):
+        super().__init__(playre_image, x, y, w, h, speed)
+        self.speed_x = speed_x
+        self.speed_y = speed_y
+        
+    def move(self):
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
 
-windw = display.set_mode((700,600))
+windw = display.set_mode((600,400))
 display.set_caption('Пин-Понг')
 screen =transform.scale(image.load('paint_grunge_green_124502_2560x1080.jpg'), (700,600))
 
+player_1 = Playre('free-icon-minus-109744.png', 30, 200, 30, 50, 10)
+player_2 = Playre('free-icon-minus-109744.png', 540, 200, 30, 50, 10)
+ball = Ball('free-icon-tennis-balls-8022326.png', 300, 200, 30, 30, 10, 3, 3)
 
-windw.blit(screen,(0,0))
+clock = time.Clock()
+FPS = 60
+font.init()
+font1 = font.Font(None, 40)
+lose1 = font1.render('Игрок 2 победил!!!', True, (0,0,255))
+lose2 = font1.render('Игрок 1 победил!!!', True, (0,0,255))
+game = True
+finish = False
+while game:
+    for i in event.get():
+        if i.type == QUIT:
+            game = False
+    if finish != True:
+        windw.blit(screen,(0,0))
+        player_1.reset()
+        player_2.reset()
+        ball.reset()
+        player_1.letter()
+        player_2.movement()
+        ball.move()
+        if sprite.collide_rect(player_1, ball) or sprite.collide_rect(player_2, ball):
+            ball.speed_x *= -1
+        if ball.rect.y > 370 or ball.rect.y < 0:
+            ball.speed_y *= -1
+            
+        if ball.rect.x < 0:
+            finish = True
+            windw.blit(lose1, (210,160))
+        if ball.rect.x > 575:
+            finish = True
+            windw.blit(lose2, (210,160))
+    clock.tick(FPS)
+    display.update()
