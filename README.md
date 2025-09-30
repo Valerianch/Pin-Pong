@@ -1,5 +1,5 @@
 # Pin-Pong
-A game similar to ping pong, for two players
+This is a computer version of ping pong
 ##Controls 
 For player 1, move up with the 'w' key
 For player 1, move down with the 's' key
